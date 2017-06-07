@@ -1,0 +1,7 @@
+spring : 
+    application:
+        name: nwwd
+    profiles : 
+        active : 
+           - dev
+           - dev-error
