@@ -1,0 +1,127 @@
+<meta charset="utf-8">
+<namespace id="label-add" ms-controller="label_add">
+	<ol class="breadcrumb">
+        <li><a href="#">标签管理</a></li>
+        <li><a href="#">新增</a></li>
+    </ol>
+
+    <section class="content" id="addLabelSection">
+    	<div class="box box-info">
+    		<form role="form" id="addLabelForm"  class="form-horizontal">
+    			<div class="row ">
+	                <div class="col-sm-12">
+	                    <!-- 右对齐的 btn-group -->
+	                    <div class="btn-group pull-left" style="margin-top: 20px;margin-left: 28px;">
+	                        <button type="submit" class="btn btn-sm btn-primary">
+	                            <i class="fa fa-floppy-o"></i> 提交
+	                        </button>
+	                        <a class="btn btn-sm btn-default" id="btnCancel">
+	                            <i class="fa fa-align-justify"> 返回</i>
+	                        </a>
+	                    </div>
+	                </div>
+            	</div>
+
+            	<div class="box-body">
+            		<div class="form-group">
+	      				<label for="code" class="col-sm-1 control-label requiredMask input-sm">标签编号</label>
+	   			 		<div class="col-sm-5">
+	   			 			<input name="code" type="text" class="form-control input-sm" placeholder="" >
+	   			 		</div>
+	      			</div>
+
+	      			<div class="form-group">
+	      				<label for="name" class="col-sm-1 control-label requiredMask input-sm">标签名称</label>
+	   			 		<div class="col-sm-5">
+	   			 			<input name="name" type="text" class="form-control input-sm" placeholder="" >
+	   			 		</div>
+	      			</div>
+
+	      			<div class="form-group">
+	      				<label for="desc" class="col-sm-1 control-label requiredMask input-sm">标签描述</label>
+	   			 		<div class="col-sm-5">
+   			 				<textarea name="desc" rows="3" class="form-control input-sm" placeholder=""></textarea>
+   			 			</div>
+	      			</div>
+
+            		<div class="form-group">
+	   			 		<label for="enable" class="col-sm-1 control-label requiredMask input-sm">是否启用</label>
+						<div class="col-sm-5">
+							<select name="enable" class="form-control input-sm select2">
+								<option selected="selected" value="-1">请选择</option>
+								<option ms-for="el in @status" ms-attr="{value:el.value}" ms-text="el.name"></option>
+							</select>
+						</div>
+	   			 	</div>
+            	</div>
+    		</form>
+    	</div>
+    </section>
+</namespace>
+
+<script type="text/javascript">
+	$(function() {
+		var page = {
+			namespace : $('#label-add').namespace(),
+			model:{
+				vm:avalon.define({
+			        $id: "label_add",
+							status : {}
+			    })
+			},
+			init : function() {
+				$("#addLabelForm").validate({
+					rules : {
+						'code' : {
+							required : true,
+							maxlength : 64
+						},
+						'name' : {
+							required : true,
+							maxlength : 64
+						},
+						'desc' : {
+							required : true,
+							maxlength : 2000
+						},
+						'enable' : {
+							required : true,
+							valueNotEquals : '-1'
+						}
+					},submitHandler : function(form) {
+						page.doAdd();
+					}
+				});
+			},
+			doAdd : function() {
+				var submitLabelForm = {
+					endpoint : "/labelmag/saveLabel",
+					formObj : $("#addLabelForm"),
+					success : function(data) {
+						alertTool.success("操作成功!");
+						page.doCancel();
+					},
+					failure:function(data) {
+						alertTool.error(data);
+					}
+				};
+
+				page.namespace.submitForm(submitLabelForm);
+			},
+			doCancel : function() {
+				page.namespace.skiphtml("/pages/labelmag/labelmag-list.html");
+			},
+			getStatus : function(){
+
+				page.namespace.getCodes(function(data){
+					page.model.vm.status=data;
+				},"LABEL_USEABLE");
+			}
+		}
+
+		avalon.scan(page.namespace.root[0], page.model.vm);  // void braces
+		page.getStatus() ;
+		page.init();
+		page.namespace.root.find("#btnCancel").on('click', page.doCancel);
+	});
+</script>
