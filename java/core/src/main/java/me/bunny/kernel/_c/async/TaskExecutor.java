@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 
 /**
  * @author J
- * @param <T>
  */
 @Component
 public class TaskExecutor{
@@ -126,14 +125,14 @@ public class TaskExecutor{
 	
 	public abstract class Promise {
 		
-		protected Call<? super Object, ? super Object> call;
+		protected Call call;
 		
 		protected Catch cat;
-		
+
 		@SuppressWarnings("unchecked")
 		public <I,O> Promise then(Call<I,O> call){
 			if(this.call==null){
-				this.call=(Call<? super Object, ? super Object>) call;
+				this.call= call;
 				successAsync();
 			}else{
 				throw new IllegalStateException("only one call can be accept");
